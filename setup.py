@@ -13,6 +13,6 @@ setup(
     packages = [
         'roblox'
     ],
-    description = 'Roblox Python API',
+    description = 'Roblox Cloud API',
     python_requires = '>=3.8.0'
 )
