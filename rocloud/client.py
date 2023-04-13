@@ -1,6 +1,4 @@
 import aiohttp
-from typing import Optional, Union
-from urllib import parse
 import asyncio
 from .errors import HTTPException
 from .datastore import DataStore, Entry
@@ -27,14 +25,15 @@ class Client:
         universe_id: int,
         datastore, 
         key, 
-        scope: str = 'global'
-    ):
+        scope: str = None
+    ) -> None:
         params = {}
         params['universeId'] = universe_id
         params['datastoreName'] = datastore
         params['entryKey'] = key
-        params['scope'] = scope
-        params = parse.urlencode(params)
+        if scope:
+            params['scope'] = scope
+
         response = await self.session.get(f'https://apis.roblox.com/datastores/v1/universes/{universe_id}/standard-datastores/datastore/entries/entry', params=params, headers=self.api_key)
         data = await response.json()
         _ = self.run_error_handler(data['error']) if data.get('error') != None else False
@@ -42,10 +41,10 @@ class Client:
 
     async def get_datastores(
         self, 
-        universe_id, 
-        cursor=None, 
-        limit: int = 5, 
-        prefix: str = ''
+        universe_id,
+        prefix: str = None,
+        cursor: str = None,
+        limit: int = 5
     ) -> None:
         params = {}
         if prefix:
@@ -55,8 +54,7 @@ class Client:
         if limit:
             params['limit'] = limit
 
-        params = parse.urlencode(params)
-        response = await self.session.get(f'https://apis.roblox.com/datastores/v1/universes/{universe_id}/standard-datastores?{params}', headers=self.api_key)
+        response = await self.session.get(f'https://apis.roblox.com/datastores/v1/universes/{universe_id}/standard-datastores', params=params, headers=self.api_key)
         data = await response.json()
         _ = self.run_error_handler(data['error']) if data.get('error') != None else False
         return [DataStore(self, universe_id, datastore) for datastore in data['datastores']]

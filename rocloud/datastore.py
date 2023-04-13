@@ -20,7 +20,7 @@ class DataStore:
         self,
         prefix: str = None,
         cursor: str = None,
-        scope: str = 'global',
+        scope: str = None,
         all_scopes: bool = True,
         limit: int = 10,
     ):
@@ -29,8 +29,9 @@ class DataStore:
             params['prefix'] = prefix
         if cursor:
             params['cursor'] = prefix
-
-        params['scope'] = scope
+        if scope:
+            params['scope'] = scope
+            
         params['limit'] = limit if limit < 100 else 100
         params['allScopes'] = 'true' if all_scopes == True else 'false'
 
